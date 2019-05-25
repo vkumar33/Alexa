@@ -77,14 +77,14 @@ class SolutionIntentHandler(AbstractRequestHandler):
                 is_intent_name("SolutionIntent")(handler_input))
 
     def handle(self, handler_input):
-	    session_attr = handler_input.attributes_manager.session_attributes
-	    value = handler_input.request_envelope.request.intent.slots['solution'].value
-	    session_attr['numberSolutions'] += 1
-	    session_attr['solution'][session_attr['numberSolutions']] = value
-	    speech = 'I heard ' + value + '. That is ' + session_attr['numberSolutions'] + ' solutions so far. Do you have other solutions? If not, say no more solutions'
-	    reprompt = " I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
-	    handler_input.response_builder.speak(speech).ask(reprompt)
-	    return handler_input.response_builder.response
+        session_attr = handler_input.attributes_manager.session_attributes
+        value = handler_input.request_envelope.request.intent.slots['solution'].value
+        session_attr['numberSolutions'] += 1
+        session_attr['solution'][session_attr['numberSolutions']] = value
+        speech = 'I heard ' + value + '. That is ' + session_attr['numberSolutions'] + ' solutions so far. Do you have other solutions? If not, say no more solutions'
+        reprompt = " I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
+        handler_input.response_builder.speak(speech).ask(reprompt)
+        return handler_input.response_builder.response
 
 class SolutionEndIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -130,32 +130,29 @@ class ProsAndConsEndIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> bool
         return (is_request_type("IntentRequest")(handler_input) and
                 is_intent_name("ProsAndConsEndIntent")(handler_input))
-
+    
     def handle(self, handler_input):
-
-    	session_attr = handler_input.attributes_manager.session_attributes
-    	solutionText = ""
-
-    	for i in range(session_attr['numberSolutions']):
-    		solutionText += session_attr["index"] + ","
-
-
-    	if (session_attr["solutionIndex"] >= session_attr['numberSolutions']) :
-    	    speech = 'Thank you for being open about the pros and cons of your solutions. Now I would like you to choose a solution to try for next week. ' + 'Think about which solution is most feasible. Which has the best chance of achieving your goal. ' +'The solutions you have mentioned are ' + solutionText + ' and you can choose one.'
-            #reprompt = "What solution would you like to try?"
+        session_attr = handler_input.attributes_manager.session_attributes
+        solutionText = ""
+        
+        for i in range(session_attr["numberSolutions"]):
+            solutionText = solutionText + session_attr["index"] + ","
+            
+        if (session_attr["solutionIndex"] >= session_attr["numberSolutions"]):
+            speech = 'Thank you for being open about the pros and cons of your solutions. Now I would like you to choose a solution to try for next week. ' + 'Think about which solution is most feasible. Which has the best chance of achieving your goal. ' +'The solutions you have mentioned are ' + solutionText + ' and you can choose one.'
+            reprompt = "What solution would you like to try?"
             handler_input.response_builder.add_directive(DelegateDirective(updated_intent = "SolutionChoiceIntent")).speak(speech).ask(reprompt)
             return handler_input.response_builder.response
-    	else :
-    	    session_attr["solutionIndex"] += 1
-    	    session_attr = handler_input.attributes_manager.session_attributes
-    	    value = session_attr["solution"][session_attr["solutionIndex"]]
-
-    	    speech = 'On to next solution, ' + value + '. Again, say "a pro is" or "a con is", or "no more pros and cons".'
-    	    reprompt = 'Any pros and cons for ' + value + '?'
-
-    	    handler_input.response_builder.speak(speech).ask(reprompt)
+            
+        else :
+            session_attr["solutionIndex"] +=1
+            value = session_attr["solution"][session_attr["solutionIndex"]] 
+            
+            speech = "On to next solution, " + value + '. Again, say "a pro is" or "a con is", or "no more pros and cons".' 
+            reprompt = "Any pros and cons for " + value + "?"
+            
+            handler_input.response_builder.speak(speech).ask(reprompt)
             return handler_input.response_builder.response
-
 
 class SolutionChoiceIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -325,7 +322,6 @@ class ResponseLogger(AbstractResponseInterceptor):
 
 
 # Register intent handlers
-sb.add_request_handler(GetNewFactHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(FallbackIntentHandler())
