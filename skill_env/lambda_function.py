@@ -44,6 +44,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
             'recognizable solution is not apparent. The problem should focus on the here and now, and currently affecting you. '
             'Also, it should be something you have control over to solve. Think about it for a moment. When you are ready, tell me '
             'about your problem.')
+            
 
         reprompt = 'I am interested in hearing about your problem. Can you tell me a problem you have?'
         
@@ -52,7 +53,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
-
+'''
 class GoalIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
@@ -72,7 +73,7 @@ class GoalIntentHandler(AbstractRequestHandler):
         #handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ProblemIntent')).speak(speech).ask(reprompt)
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
-
+'''
 
 class ProblemIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -106,18 +107,22 @@ class SolutionIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         session_attr = handler_input.attributes_manager.session_attributes
-        value = handler_input.request_envelope.request.intent.slots['Solution'].value
-        session_attr['numberSolutions'] += 1
-        session_attr['solution'][session_attr['numberSolutions']] = value
-        speech = 'I heard ' + value + '. That is ' + session_attr['numberSolutions'] + ' solutions so far. Do you have other solutions? If not, say no more solutions'
-        reprompt = " I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
         
-        session_attr['intentname'] = "SolutionIntent"
-        handler_input.attributes_manager.session_attributes = session_attr
+        if handler_input.dialog_state != "COMPLETED":
+            value = handler_input.request_envelope.request.intent.slots['Solution'].value
+            session_attr['numberSolutions'] += 1
+            session_attr['solution'][session_attr['numberSolutions']] = value
+            speech = 'I heard ' + value + '. That is ' + session_attr['numberSolutions'] + ' solutions so far. Do you have other solutions? If not, say no more solutions'
+        
+        
+            reprompt = " I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
+        
+            session_attr['intentname'] = "SolutionIntent"
+            handler_input.attributes_manager.session_attributes = session_attr
 
-        handler_input.response_builder.speak(speech).ask(reprompt)
-        #handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'SolutionEndIntent')).speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            #handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'SolutionEndIntent')).speak(speech).ask(reprompt)
+            return handler_input.response_builder.response
 
 class SolutionEndIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -254,14 +259,15 @@ class ActionPlanEndIntentHandler(AbstractRequestHandler):
         session_attr['intentname'] = "ActionPlanEndIntent"
         handler_input.attributes_manager.session_attributes = session_attr
         
-        handler_input.response_builder.speak(speech).ask(reprompt)
+        handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ConfidenceIntent')).speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
 class ConfidenceIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
     def can_handle(self, handler_input):
         # type: (HandlerInput) -> bool
-        return (is_intent_name("ConfidenceIntent")(handler_input))
+        return (is_request_type("IntentRequest")(handler_input) and
+            is_intent_name("ConfidenceIntent")(handler_input))
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
@@ -402,7 +408,7 @@ class ResponseLogger(AbstractResponseInterceptor):
 # Register intent handlers
 
 sb.add_request_handler(LaunchRequestHandler())
-sb.add_request_handler(GoalIntentHandler())
+#sb.add_request_handler(GoalIntentHandler())
 sb.add_request_handler(ProblemIntentHandler())
 sb.add_request_handler(SolutionIntentHandler())
 sb.add_request_handler(SolutionEndIntentHandler())

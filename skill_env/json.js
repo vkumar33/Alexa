@@ -78,18 +78,25 @@
                     "slots": [
                         {
                             "name": "Pro",
-                            "type": "AMAZON.SearchQuery"
+                            "type": "AMAZON.SearchQuery",
+                            "samples": [
+                                "An advantage is {Pro}",
+                                "A pro is {Pro}",
+                                "One advantage might be {Pro}",
+                                "One good thing is {Pro}",
+                                "Pro is {Pro}",
+                                "Good is {Pro}"
+                            ]
                         },
                         {
                             "name": "Con",
                             "type": "AMAZON.SearchQuery",
                             "samples": [
-                                "An disadvantage is {Con}",
-                                "A Con is {Con}",
-                                "One disadvantage might be {Con}",
-                                "One bad thing is {Con}",
                                 "Con is {Con}",
-                                "Bad is {Con}"
+                                "One bad thing is {Con}",
+                                "One disadvantage might be {Con}",
+                                "A con is {Con}",
+                                "An disadvantage is {Con}"
                             ]
                         }
                     ],
@@ -231,16 +238,17 @@
                 },
                 {
                     "name": "SolutionIntent",
-                    "confirmationRequired": false,
-                    "prompts": {},
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.343117624733"
+                    },
                     "slots": [
                         {
                             "name": "Solution",
                             "type": "AMAZON.SearchQuery",
-                            "confirmationRequired": true,
+                            "confirmationRequired": false,
                             "elicitationRequired": true,
                             "prompts": {
-                                "confirmation": "Confirm.Slot.812942704779.27889244345",
                                 "elicitation": "Elicit.Slot.334262902940.508683137030"
                             }
                         }
@@ -304,35 +312,30 @@
                 },
                 {
                     "name": "ProsAndConsIntent",
-                    "confirmationRequired": false,
-                    "prompts": {},
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.597760205675"
+                    },
                     "slots": [
                         {
                             "name": "Pro",
                             "type": "AMAZON.SearchQuery",
                             "confirmationRequired": false,
-                            "elicitationRequired": false,
-                            "prompts": {}
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.790079411656.584679685244"
+                            }
                         },
                         {
                             "name": "Con",
                             "type": "AMAZON.SearchQuery",
-                            "confirmationRequired": true,
+                            "confirmationRequired": false,
                             "elicitationRequired": true,
                             "prompts": {
-                                "confirmation": "Confirm.Slot.690646501250.780469113880",
-                                "elicitation": "Elicit.Slot.690646501250.780469113880"
+                                "elicitation": "Elicit.Slot.1488540432500.1195698340921"
                             }
                         }
                     ]
-                },
-                {
-                    "name": "ProsAndConsEndIntent",
-                    "confirmationRequired": true,
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.201078496191"
-                    },
-                    "slots": []
                 }
             ],
             "delegationStrategy": "ALWAYS"
@@ -495,7 +498,34 @@
                 ]
             },
             {
-                "id": "Elicit.Slot.690646501250.780469113880",
+                "id": "Elicit.Slot.790079411656.584679685244",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Can you please suggest another Pro"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.790079411656.584679685244",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You have suggested these Pros - {Pro} . When you're done with all Pros and Cons, say no more pros and cons or I am done with Pros and cons"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.343117624733",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You have suggested these solutions - {Solution} . When you're done, say no more solutions or i am done with solutions"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.1488540432500.1195698340921",
                 "variations": [
                     {
                         "type": "PlainText",
@@ -504,7 +534,7 @@
                 ]
             },
             {
-                "id": "Confirm.Slot.690646501250.780469113880",
+                "id": "Confirm.Slot.1488540432500.1195698340921",
                 "variations": [
                     {
                         "type": "PlainText",
@@ -513,11 +543,11 @@
                 ]
             },
             {
-                "id": "Confirm.Intent.201078496191",
+                "id": "Confirm.Intent.597760205675",
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "Are you done with Pros and Cons"
+                        "value": "You have suggested these Pros - {Pro}  and Cons - {Con} When you're done with all Pros and Cons, say no more pros and cons or I am done with Pros and cons"
                     }
                 ]
             }
