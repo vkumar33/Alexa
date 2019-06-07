@@ -165,6 +165,7 @@
                         }
                     ],
                     "samples": [
+                        "My plan is {ActionPlan}",
                         "I need to {ActionPlan}",
                         "I am going to {ActionPlan}",
                         "I will {ActionPlan}",
@@ -172,26 +173,20 @@
                     ]
                 },
                 {
-                    "name": "ActionPlanEndIntent",
-                    "slots": [],
-                    "samples": [
-                        "i have no more actions to say",
-                        "i have no more actions to add",
-                        "my action plan is done",
-                        "no more actions"
-                    ]
-                },
-                {
                     "name": "ConfidenceIntent",
                     "slots": [
                         {
                             "name": "Confidence",
-                            "type": "AMAZON.NUMBER"
+                            "type": "AMAZON.NUMBER",
+                            "samples": [
+                                "I am {Confidence}",
+                                "{Confidence}"
+                            ]
                         }
                     ],
                     "samples": [
                         "{Confidence}",
-                        "I am a {Confidence} out of ten"
+                        "I am  {Confidence} out of ten"
                     ]
                 },
                 {
@@ -238,9 +233,10 @@
                 },
                 {
                     "name": "SolutionIntent",
+                    "delegationStrategy": "SKILL_RESPONSE",
                     "confirmationRequired": true,
                     "prompts": {
-                        "confirmation": "Confirm.Intent.343117624733"
+                        "confirmation": "Confirm.Intent.153296931637"
                     },
                     "slots": [
                         {
@@ -274,6 +270,7 @@
                 },
                 {
                     "name": "ActionPlanIntent",
+                    "delegationStrategy": "SKILL_RESPONSE",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": [
@@ -290,24 +287,27 @@
                 },
                 {
                     "name": "ConfidenceIntent",
-                    "confirmationRequired": false,
-                    "prompts": {},
+                    "delegationStrategy": "SKILL_RESPONSE",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.1309998090654"
+                    },
                     "slots": [
                         {
                             "name": "Confidence",
                             "type": "AMAZON.NUMBER",
                             "confirmationRequired": false,
-                            "elicitationRequired": false,
-                            "prompts": {}
+                            "elicitationRequired": true,
+                            "prompts": {
+                                "elicitation": "Elicit.Slot.144077605901.1084638772177"
+                            }
                         }
                     ]
                 },
                 {
                     "name": "SolutionEndIntent",
-                    "confirmationRequired": true,
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.788742071724"
-                    },
+                    "confirmationRequired": false,
+                    "prompts": {},
                     "slots": []
                 },
                 {
@@ -336,6 +336,15 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "ProsAndConsEndIntent",
+                    "delegationStrategy": "SKILL_RESPONSE",
+                    "confirmationRequired": true,
+                    "prompts": {
+                        "confirmation": "Confirm.Intent.919198227094"
+                    },
+                    "slots": []
                 }
             ],
             "delegationStrategy": "ALWAYS"
@@ -548,6 +557,78 @@
                     {
                         "type": "PlainText",
                         "value": "You have suggested these Pros - {Pro}  and Cons - {Con} When you're done with all Pros and Cons, say no more pros and cons or I am done with Pros and cons"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.1174405225404",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You said your solution is {Solution} . If you are done say I am done with solutions or no more solutions."
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.856771444386.1137909418176",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You said your solution is {Solution} . Is that correct ?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.36137563488",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You said your solution is {Solution} . If you are done say I am done with solutions or no more solutions."
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Slot.1376595599999.1370040395053",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you done with solutions. If yes say I am done with solutions or no more solutions"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.153296931637",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you done with solutions. If yes say I am done with solutions or no more solutions ?"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.919198227094",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Are you sure ?"
+                    }
+                ]
+            },
+            {
+                "id": "Elicit.Slot.144077605901.1084638772177",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "On a scale from one to ten, how confident are you that you can carry out your plan"
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.1309998090654",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "You said {Confidence} . Thank you for taking the time. I wish you good luck, and look forward to hearing how things go for you next time."
                     }
                 ]
             }

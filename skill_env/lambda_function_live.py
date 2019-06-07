@@ -55,27 +55,6 @@ class LaunchRequestHandler(AbstractRequestHandler):
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
-'''
-class GoalIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (is_request_type("IntentRequest")(handler_input) and
-                is_intent_name("GoalIntent")(handler_input))
-
-    def handle(self, handler_input):
-
-        speech = ('Now that you have identified a problem, the next step is for you to think about establishing a goal, '
-            'in other words, what do you hope to achieve by solving this problem? The goal you set should be “SMART”'
-            "specific, measurable, actionable, realistic, and time-bound. So keeping that in mind, what is the goal you would like to set? ",
-            "When you are ready, tell me your goal, by saying my goal is.")
-
-        reprompt = "I am interested in hearing any potential goals. Say something that begins with my goal is "
-
-
-        #handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ProblemIntent')).speak(speech).ask(reprompt)
-        handler_input.response_builder.speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
-'''
 
 class ProblemIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -92,7 +71,7 @@ class ProblemIntentHandler(AbstractRequestHandler):
         speech = ('Thank you for sharing with me. You have identified a problem and set a goal. Good so far. '
             'Next, I would like you to brainstorm some possible solutions to your problem. This may take a few minutes. Try to '
             "be as creative as possible. Don't limit yourself in any way. When you are ready, tell me your solution, by saying "
-            "my solution is. When you're done, say all done")
+            "my solution is. When you're done, no more solutions")
 
         reprompt = "I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
         
@@ -259,26 +238,6 @@ class ActionPlanIntentHandler(AbstractRequestHandler):
         handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ConfidenceIntent')).speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
-class ActionPlanEndIntentHandler(AbstractRequestHandler):
-    """Handler for Help Intent."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (is_request_type("IntentRequest")(handler_input) and
-            is_intent_name("ActionPlanEndIntent")(handler_input))
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        
-        session_attr = handler_input.attributes_manager.session_attributes
-        session_attr['intentname'] = "ActionPlanEndIntent"
-        handler_input.attributes_manager.session_attributes = session_attr
-        
-        speech = ("Sound's like you have a plan. How confident do you feel on a scale from 1-10, where 1 is not confident at all, and 10 is very confident that "
-            ' you will be able to carry out the plan to solve your problem?')
-        reprompt = 'On a scale from 1-10, how confident are you that you can carry out your plan?'
-        
-        handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ConfidenceIntent')).speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
 
 class ConfidenceIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -289,13 +248,13 @@ class ConfidenceIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        value = handler_input.request_envelope.request.intent.slots.Confidence.value;
+        #value = handler_input.request_envelope.request.intent.slots['Confidence'].value;
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr['intentname'] = "ConfidenceIntent"
         handler_input.attributes_manager.session_attributes = session_attr
         
-        speech = 'You said ' + str(value) + '. Thank you for taking the time. I wish you good luck, and look forward to hearing how things go for you next time.'
-        
+        #speech = 'You said ' + str(value) + '. Thank you for taking the time. I wish you good luck, and look forward to hearing how things go for you next time.'
+        speech = "hello world"
         handler_input.response_builder.speak(speech).set_should_end_session(True)
         return handler_input.response_builder.response
 
@@ -426,7 +385,6 @@ class ResponseLogger(AbstractResponseInterceptor):
 # Register intent handlers
 
 sb.add_request_handler(LaunchRequestHandler())
-#sb.add_request_handler(GoalIntentHandler())
 sb.add_request_handler(ProblemIntentHandler())
 sb.add_request_handler(SolutionIntentHandler())
 sb.add_request_handler(SolutionEndIntentHandler())
@@ -434,7 +392,6 @@ sb.add_request_handler(ProsAndConsIntentHandler())
 sb.add_request_handler(ProsAndConsEndIntentHandler())
 sb.add_request_handler(SolutionChoiceIntentHandler())
 sb.add_request_handler(ActionPlanIntentHandler())
-sb.add_request_handler(ActionPlanEndIntentHandler())
 sb.add_request_handler(ConfidenceIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
@@ -451,3 +408,4 @@ sb.add_global_response_interceptor(ResponseLogger())
 
 # Handler name that is used on AWS lambda
 lambda_handler = sb.lambda_handler()
+
