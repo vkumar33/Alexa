@@ -39,6 +39,7 @@ class LaunchRequestHandler(AbstractRequestHandler):
         session_attr['intentname'] = "ProblemIntent"
         session_attr['statement'] = ""
         session_attr['proandcon'] = {}
+        session_attr['i'] = 1
 
 
         speech = ('Hi - I am Lumen, your health coach. My job is to counsel you with problem solving therapy. '
@@ -55,27 +56,6 @@ class LaunchRequestHandler(AbstractRequestHandler):
         handler_input.response_builder.speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
-'''
-class GoalIntentHandler(AbstractRequestHandler):
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (is_request_type("IntentRequest")(handler_input) and
-                is_intent_name("GoalIntent")(handler_input))
-
-    def handle(self, handler_input):
-
-        speech = ('Now that you have identified a problem, the next step is for you to think about establishing a goal, '
-            'in other words, what do you hope to achieve by solving this problem? The goal you set should be “SMART”'
-            "specific, measurable, actionable, realistic, and time-bound. So keeping that in mind, what is the goal you would like to set? ",
-            "When you are ready, tell me your goal, by saying my goal is.")
-
-        reprompt = "I am interested in hearing any potential goals. Say something that begins with my goal is "
-
-
-        #handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ProblemIntent')).speak(speech).ask(reprompt)
-        handler_input.response_builder.speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
-'''
 
 class ProblemIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -92,7 +72,7 @@ class ProblemIntentHandler(AbstractRequestHandler):
         speech = ('Thank you for sharing with me. You have identified a problem and set a goal. Good so far. '
             'Next, I would like you to brainstorm some possible solutions to your problem. This may take a few minutes. Try to '
             "be as creative as possible. Don't limit yourself in any way. When you are ready, tell me your solution, by saying "
-            "my solution is. When you're done, say all done")
+            "my solution is. When you're done, no more solutions")
 
         reprompt = "I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
         
@@ -119,7 +99,7 @@ class SolutionIntentHandler(AbstractRequestHandler):
         
 
         if handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED:
-            speech = 'I heard ' + str(value) + '. That is ' + str(session_attr['numberSolutions']) + ' solutions so far. Do you have other solutions? If not, say no more solutions'
+            speech = 'I heard ' + str(value) + '. That is ' + str(session_attr['numberSolutions']) + ' solutions so far. Do you have other solutions? If yes, then say "My solution is" or  else say no more solutions'
             reprompt = " I am interested in hearing any potential solutions. Say something that begins with my solution is. When you're done, say no more solutions"
             handler_input.attributes_manager.session_attributes = session_attr
             handler_input.response_builder.speak(speech).ask(reprompt)
@@ -151,7 +131,6 @@ class SolutionEndIntentHandler(AbstractRequestHandler):
         session_attr['intentname'] = "SolutionEndIntent"
         handler_input.attributes_manager.session_attributes = session_attr
 
-        #handler_input.response_builder.speak(speech).ask(reprompt)
         handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ProsAndConsIntent')).speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
@@ -160,39 +139,62 @@ class ProsAndConsIntentHandler(AbstractRequestHandler):
         # type: (HandlerInput) -> bool
         return ( is_request_type("IntentRequest")(handler_input) and
             is_intent_name("ProsAndConsIntent")(handler_input))
+            
 
     def handle(self, handler_input):
-        
         session_attr = handler_input.attributes_manager.session_attributes
-        value = session_attr['solution'][session_attr['solutionIndex']]
         session_attr['intentname'] = "ProsAndConsIntent"
         handler_input.attributes_manager.session_attributes = session_attr
 
-        i = 1
-        session_attr['statement'] = "i"
+        session_attr['statement'] = "0"
         handler_input.attributes_manager.session_attributes = session_attr
         
-        if session_attr["numberSolutions"] >= i and handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED:
-            value = session_attr['solution'][session_attr[i]]
-            session_attr['proandcon'][value] = [handler_input.request_envelope.request.intent.slots['Pro'].value]
-            session_attr['proandcon'][value].append(handler_input.request_envelope.request.intent.slots['Con'].value)
+        if ((int(session_attr["numberSolutions"]) == 1 or session_attr['i'] == 1) and (handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED)) :
+            session_attr['statement'] = "1"
+            value = session_attr['solution']["1"]
+            session_attr['i'] += 1
             handler_input.attributes_manager.session_attributes = session_attr
-            i += 1
-            speech = 'For your solution' + str(value) + ', say a pro and a con for your solution. Say "a pro is" or "a con is" or "no more pros and cons" to end'
+            speech = 'For your solution ' + str(value) + ', say a pro and a con for your solution. Say "a pro is" or "a con is" or "no more pros and cons" to end'
             reprompt = "Any pros and cons for " + str(value) + "?"
-            session_attr['statement'] = "if"
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            return handler_input.response_builder.response
+            
+        elif ((int(session_attr["numberSolutions"]) > session_attr['i']) and (handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED)):
+            oldvalue = session_attr['solution'][str(session_attr['i']-1)]
+            value = session_attr['solution'][str(session_attr['i'])]
+            session_attr['proandcon'][oldvalue] = [handler_input.request_envelope.request.intent.slots['Pro'].value, handler_input.request_envelope.request.intent.slots['Con'].value]
+            handler_input.attributes_manager.session_attributes = session_attr
+            session_attr['i'] += 1
+            speech = 'For your solution ' + str(value) + ', say a pro and a con for your solution. Say "a pro is" or "a con is" or "no more pros and cons" to end'
+            reprompt = "Any pros and cons for " + str(value) + "?"
+            session_attr['statement'] = "2"
             handler_input.attributes_manager.session_attributes = session_attr
             handler_input.response_builder.speak(speech).ask(reprompt)
             return handler_input.response_builder.response
             
-        else :
+        elif ((int(session_attr["numberSolutions"]) == session_attr['i']) and (handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED)):
+            oldvalue = session_attr['solution'][str(session_attr['i']-1)]
+            value = session_attr['solution'][str(session_attr['i'])]
+            session_attr['proandcon'][oldvalue] = [handler_input.request_envelope.request.intent.slots['Pro'].value, handler_input.request_envelope.request.intent.slots['Con'].value]
+            handler_input.attributes_manager.session_attributes = session_attr
+            speech = 'For your solution ' + str(value) + ', say a pro and a con for your solution. Say "a pro is" or "a con is" or "no more pros and cons" to end'
+            reprompt = "Any pros and cons for " + str(value) + "?"
+            session_attr['statement'] = "3"
+            session_attr['i'] += 1
+            handler_input.attributes_manager.session_attributes = session_attr
+            handler_input.response_builder.speak(speech).ask(reprompt)
+            return handler_input.response_builder.response   
+            
+        elif (((int(session_attr["numberSolutions"]) + 1) == session_attr['i']) and (handler_input.request_envelope.request.dialog_state != DialogState.COMPLETED)):
+            oldvalue = session_attr['solution'][str(session_attr['i']-1)]
+            session_attr['proandcon'][oldvalue] = [handler_input.request_envelope.request.intent.slots['Pro'].value, handler_input.request_envelope.request.intent.slots['Con'].value]
+            handler_input.attributes_manager.session_attributes = session_attr
             speech = "You are done with the Pros and Cons. Kindly end this intent by saying 'no more pros and cons'"
-            session_attr['statement'] = "else"
+            session_attr['statement'] = "4"
             handler_input.attributes_manager.session_attributes = session_attr
             handler_input.response_builder.add_directive(DelegateDirective(updated_intent = "ProsAndConsEndIntent"))
             return handler_input.response_builder.response
             
-        
 
 class ProsAndConsEndIntentHandler(AbstractRequestHandler):
     def can_handle(self, handler_input):
@@ -205,7 +207,6 @@ class ProsAndConsEndIntentHandler(AbstractRequestHandler):
         solutionText = ""
         session_attr['intentname'] = "ProsAndConsEndIntent"
         handler_input.attributes_manager.session_attributes = session_attr
-        
         
         i = 1
         
@@ -259,26 +260,6 @@ class ActionPlanIntentHandler(AbstractRequestHandler):
         handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ConfidenceIntent')).speak(speech).ask(reprompt)
         return handler_input.response_builder.response
 
-class ActionPlanEndIntentHandler(AbstractRequestHandler):
-    """Handler for Help Intent."""
-    def can_handle(self, handler_input):
-        # type: (HandlerInput) -> bool
-        return (is_request_type("IntentRequest")(handler_input) and
-            is_intent_name("ActionPlanEndIntent")(handler_input))
-
-    def handle(self, handler_input):
-        # type: (HandlerInput) -> Response
-        
-        session_attr = handler_input.attributes_manager.session_attributes
-        session_attr['intentname'] = "ActionPlanEndIntent"
-        handler_input.attributes_manager.session_attributes = session_attr
-        
-        speech = ("Sound's like you have a plan. How confident do you feel on a scale from 1-10, where 1 is not confident at all, and 10 is very confident that "
-            ' you will be able to carry out the plan to solve your problem?')
-        reprompt = 'On a scale from 1-10, how confident are you that you can carry out your plan?'
-        
-        handler_input.response_builder.add_directive(DelegateDirective(updated_intent = 'ConfidenceIntent')).speak(speech).ask(reprompt)
-        return handler_input.response_builder.response
 
 class ConfidenceIntentHandler(AbstractRequestHandler):
     """Handler for Help Intent."""
@@ -289,7 +270,7 @@ class ConfidenceIntentHandler(AbstractRequestHandler):
 
     def handle(self, handler_input):
         # type: (HandlerInput) -> Response
-        value = handler_input.request_envelope.request.intent.slots.Confidence.value;
+        value = handler_input.request_envelope.request.intent.slots['Confidence'].value;
         session_attr = handler_input.attributes_manager.session_attributes
         session_attr['intentname'] = "ConfidenceIntent"
         handler_input.attributes_manager.session_attributes = session_attr
@@ -426,7 +407,6 @@ class ResponseLogger(AbstractResponseInterceptor):
 # Register intent handlers
 
 sb.add_request_handler(LaunchRequestHandler())
-#sb.add_request_handler(GoalIntentHandler())
 sb.add_request_handler(ProblemIntentHandler())
 sb.add_request_handler(SolutionIntentHandler())
 sb.add_request_handler(SolutionEndIntentHandler())
@@ -434,7 +414,6 @@ sb.add_request_handler(ProsAndConsIntentHandler())
 sb.add_request_handler(ProsAndConsEndIntentHandler())
 sb.add_request_handler(SolutionChoiceIntentHandler())
 sb.add_request_handler(ActionPlanIntentHandler())
-sb.add_request_handler(ActionPlanEndIntentHandler())
 sb.add_request_handler(ConfidenceIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
