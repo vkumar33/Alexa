@@ -78,29 +78,20 @@
                     "slots": [
                         {
                             "name": "Pro",
-                            "type": "AMAZON.SearchQuery",
-                            "samples": [
-                                "An advantage is {Pro}",
-                                "A pro is {Pro}",
-                                "One advantage might be {Pro}",
-                                "One good thing is {Pro}",
-                                "Pro is {Pro}",
-                                "Good is {Pro}"
-                            ]
+                            "type": "AMAZON.Person"
                         },
                         {
                             "name": "Con",
-                            "type": "AMAZON.SearchQuery",
-                            "samples": [
-                                "Con is {Con}",
-                                "One bad thing is {Con}",
-                                "One disadvantage might be {Con}",
-                                "A con is {Con}",
-                                "An disadvantage is {Con}"
-                            ]
+                            "type": "AMAZON.Person"
                         }
                     ],
                     "samples": [
+                        "An advantage is {Pro} and disadvantage is {Con}",
+                        "One advantage might be {Pro} and one disadvantage might be {Con}",
+                        "One good thing is {Pro} and one bad thing is {Con}",
+                        "Good is {Pro} and bad is {Con}",
+                        "A pro is {Pro} and con is {Con}",
+                        "Start pro and con",
                         "Bad is {Con}",
                         "Good is {Pro}",
                         "Con is {Con}",
@@ -306,34 +297,30 @@
                 },
                 {
                     "name": "SolutionEndIntent",
+                    "delegationStrategy": "SKILL_RESPONSE",
                     "confirmationRequired": false,
                     "prompts": {},
                     "slots": []
                 },
                 {
                     "name": "ProsAndConsIntent",
-                    "confirmationRequired": true,
-                    "prompts": {
-                        "confirmation": "Confirm.Intent.597760205675"
-                    },
+                    "delegationStrategy": "SKILL_RESPONSE",
+                    "confirmationRequired": false,
+                    "prompts": {},
                     "slots": [
                         {
                             "name": "Pro",
-                            "type": "AMAZON.SearchQuery",
+                            "type": "AMAZON.Person",
                             "confirmationRequired": false,
-                            "elicitationRequired": true,
-                            "prompts": {
-                                "elicitation": "Elicit.Slot.790079411656.584679685244"
-                            }
+                            "elicitationRequired": false,
+                            "prompts": {}
                         },
                         {
                             "name": "Con",
-                            "type": "AMAZON.SearchQuery",
+                            "type": "AMAZON.Person",
                             "confirmationRequired": false,
-                            "elicitationRequired": true,
-                            "prompts": {
-                                "elicitation": "Elicit.Slot.1488540432500.1195698340921"
-                            }
+                            "elicitationRequired": false,
+                            "prompts": {}
                         }
                     ]
                 },
@@ -355,7 +342,7 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "You said {Problem} with a goal of {Goal} . Do I have this right so far?"
+                        "value": "You said your Problem is {Problem} with a goal of {Goal} . Do I have this right so far?"
                     },
                     {
                         "type": "PlainText",
@@ -398,15 +385,15 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "I would like to know next what your goal is. What goal would you like to set. Say something that begins with my goal is"
+                        "value": "I would like to know next what your goal is. Your goal should be SMART - specific, measurable, actionable, realistic, and time-bound. What goal would you like to set. Say something that begins with my goal is"
                     },
                     {
                         "type": "PlainText",
-                        "value": "Please tell me your goal. What do you hope to achieve by addressing this problem. Say something that begins with my goal is"
+                        "value": "Please tell me your goal. Your goal should be SMART - specific, measurable, actionable, realistic, and time-bound. What do you hope to achieve by addressing this problem. Say something that begins with my goal is"
                     },
                     {
                         "type": "PlainText",
-                        "value": "The next step is to describe a goal. What do you hope to achieve by solving this problem. Say something that begins with my goal is"
+                        "value": "The next step is to describe a goal. Your goal should be SMART - specific, measurable, actionable, realistic, and time-bound. What do you hope to achieve by solving this problem. Say something that begins with my goal is"
                     }
                 ]
             },
@@ -415,11 +402,11 @@
                 "variations": [
                     {
                         "type": "PlainText",
-                        "value": "You said {Goal} . Your goal should be SMART - specific, measurable, actionable, realistic, and time-bound. Are you okay with this goal?"
+                        "value": "You said {Goal} . Remember your goal should be SMART. Think about how you can make your goal specific, measurable, actionable, realistic, and time bound . Are you okay with this goal?"
                     },
                     {
                         "type": "PlainText",
-                        "value": "You said {Goal} . Your goal should be SMART - specific, measurable, actionable, realistic, and time-bound. Does this goal work for you?"
+                        "value": "You said {Goal} . Remember your goal should be SMART. Think about how you can make your goal specific, measurable, actionable, realistic, and time bound. Does this goal work for you?"
                     }
                 ]
             },
@@ -629,6 +616,15 @@
                     {
                         "type": "PlainText",
                         "value": "You said {Confidence} . Thank you for taking the time. I wish you good luck, and look forward to hearing how things go for you next time."
+                    }
+                ]
+            },
+            {
+                "id": "Confirm.Intent.508557081111",
+                "variations": [
+                    {
+                        "type": "PlainText",
+                        "value": "Great effort brainstorming solutions. Now let's move on. For each solution you mentioned, think about all the advantages or pros of that solution. Also, consider all of the possible disadvantages or cons of that solution ?"
                     }
                 ]
             }
